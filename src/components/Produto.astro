@@ -1,0 +1,86 @@
+---
+
+// Fetch CSV from Google Sheets
+const CSV_URL =
+  "https://docs.google.com/spreadsheets/d/1qOxc1TRbrEzdpfvl715WjouvQtvLRNXv0JgBvx37hGw/export?format=csv";
+const response = await fetch(CSV_URL);
+const csvText = await response.text();
+
+// Simple parsing
+function csvToJson(csvText: string) {
+  const lines = csvText.trim().split("\n");
+  const headers = lines[0].split(",");
+
+  function parseCSVLine(line: string) {
+    const result: string[] = [];
+    let current = "";
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"' && (i === 0 || line[i - 1] !== '\\')) {
+        inQuotes = !inQuotes;
+      } else if (char === "," && !inQuotes) {
+        result.push(current);
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+    result.push(current);
+    return result.map((v) => v.replace(/^"|"$/g, "").replace(/\\"/g, '"').trim());
+  }
+
+  return lines.slice(1).map((line) => {
+    const values = parseCSVLine(line);
+    const obj: Record<string, string> = {};
+    headers.forEach((header, index) => {
+      obj[header.trim()] = values[index] || "";
+    });
+    return obj;
+  });
+}
+
+const contentData = csvToJson(csvText);
+console.log(contentData);
+---
+
+    {
+    contentData.map((item) => (
+    <div class="max-w-7xl mx-auto my-12">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <!-- Text Content -->
+        <div class="text-content">
+          <h2
+            class="text-2xl md:text-3xl font-bold text-gray-800 mb-8 uppercase tracking-wide"
+          >{item.titulo}
+          </h2>
+  
+          <p class="text-gray-700 text-lg leading-relaxed">
+            {item.texto}    
+          </p>
+        </div>
+  
+        <!-- Image -->
+        <div class="image-container">
+          <div class="relative">
+            
+              <img
+                src={item.imagem}
+                alt="Delicioso queijo Fetta de Cabra Tradicional com café."
+                class="w-full h-auto rounded-lg shadow-lg"
+              />
+            
+  
+            <!-- Optional overlay for warmth (mimicking the warm tones of the original) -->
+            <div
+              class="absolute mix-blend-overlay inset-0 bg-gradient-to-br from-amber-100/40 to-orange-400/40 rounded-lg pointer-events-none"
+            >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    ))
+}
+</div>
