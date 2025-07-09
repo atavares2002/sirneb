@@ -42,7 +42,6 @@ function csvToJson(csvText: string) {
 }
 
 const contentData = csvToJson(csvText);
-console.log(contentData);
 ---
 
     {
@@ -63,13 +62,12 @@ console.log(contentData);
   
         <!-- Image -->
         <div class="image-container">
-          <div class="relative">
+          <div class="rounded-lg shadow-lg relative object-cover w-full h-full 2xl:h-[400px] overflow-hidden ">
             
               <img
                 src={item.imagem}
-                alt="Delicioso queijo Fetta de Cabra Tradicional com café."
-                class="w-full h-auto rounded-lg shadow-lg"
-              />
+                alt={item.alt}
+                class=""/>
             
   
             <!-- Optional overlay for warmth (mimicking the warm tones of the original) -->
